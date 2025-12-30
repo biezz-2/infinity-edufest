@@ -65,4 +65,4 @@ The project uses a custom design system defined in `tailwind.config.ts` and `glo
 
 ---
 
-Built with ❤️ by [Your Name/Team]
+Build by Biezz-2
