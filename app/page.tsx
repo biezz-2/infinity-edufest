@@ -1,18 +1,20 @@
 import SceneIntro from "@/components/scenes/SceneIntro";
 import SceneOne from "@/components/scenes/SceneOne";
 import SceneAbout from "@/components/scenes/SceneAbout";
+import SceneSelayang from "@/components/scenes/SceneSelayang";
 import SceneInteractive from "@/components/scenes/SceneInteractive";
-import SceneOutro from "@/components/scenes/SceneOutro";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-between">
+    <main className="relative w-full">
 
       <SceneIntro />
       <SceneOne />
-      <SceneInteractive />
       <SceneAbout />
-      <SceneOutro />
+      <SceneSelayang />
+      <SceneInteractive />
+      <Footer />
 
     </main>
   );

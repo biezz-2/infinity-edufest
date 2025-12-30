@@ -33,7 +33,7 @@ export default function SceneOne() {
     }, []);
 
     return (
-        <section ref={containerRef} className="h-screen w-full bg-[var(--background)] text-[var(--foreground)] flex items-center overflow-hidden relative border-t border-[var(--border)]">
+        <section ref={containerRef} className="h-screen w-full bg-gradient-to-b from-[var(--background-accent)] to-[var(--background)] text-[var(--foreground)] flex items-center overflow-hidden relative border-t border-[var(--border)]">
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {/* Decorative element using accent color */}
                 <div className="w-[80vw] h-[60vh] bg-[var(--accent)] opacity-10 transform rotate-6 rounded-3xl blur-3xl"></div>

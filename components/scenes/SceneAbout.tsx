@@ -19,7 +19,7 @@ export default function SceneAbout() {
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top top",
-                end: "+=2000%",
+                end: "+=400%",
                 scrub: 1,
                 pin: true,
             }
@@ -46,7 +46,7 @@ export default function SceneAbout() {
     }, []);
 
     return (
-        <section ref={containerRef} className={`h-screen w-full bg-[var(--background)] flex items-center justify-center relative overflow-hidden px-6 z-50 ${poppins.variable} font-sans`}>
+        <section ref={containerRef} className={`h-screen w-full bg-[var(--background)] flex items-center justify-center relative overflow-hidden px-6 ${poppins.variable} font-sans`}>
             <div ref={contentRef} className="max-w-7xl text-center flex flex-col items-center pointer-events-none">
                 <h2 className="text-5xl md:text-8xl font-extrabold uppercase tracking-tighter mb-12 text-black leading-none">
                     About Edufest

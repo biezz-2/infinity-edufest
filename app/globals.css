@@ -2,7 +2,8 @@
 
 :root {
   /* Extracted from bahan bahan/2.png (Igloo/Snow Theme) */
-  --background: #fafafa;
+  --background: #f8f9fd;
+  --background-accent: #78a0d4;
   --foreground: #171717;
   --card: #ffffff;
   --card-foreground: #171717;
