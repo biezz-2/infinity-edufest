@@ -1,111 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { motion } from "framer-motion";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import LiquidGlassNav from "@/components/ui/LiquidGlassNav";
-
-// Committee data types and structure
-type CommitteeType = "core" | "division";
-
-interface Member {
-  id: string;
-  role?: string;
-  name: string;
-  photo?: string;
-}
-
-interface Division {
-  id: string;
-  label: string;
-  type: CommitteeType;
-  coordinator?: string;
-  members: Member[] | string[];
-}
-
-// Extended committee data with more structure
-const committeeData: Division[] = [
-  {
-    id: "div_inti",
-    label: "Panitia Inti",
-    type: "core",
-    members: [
-      { id: "inti_1", role: "主席 (Ketua Umum)", name: "Azzam" },
-      { id: "inti_2", role: "副主席 (Waket)", name: "Novel" },
-      { id: "inti_3", role: "秘书 (Sek)", name: "Hammam" },
-      { id: "inti_4", role: "财务 (Bend)", name: "Lingga" },
-    ],
-  },
-  {
-    id: "div_acara",
-    label: "Divisi Acara",
-    type: "division",
-    coordinator: "Sigit",
-    members: ["Ghina", "Wania", "Rhadit", "Aqila", "Namira", "Fajri", "Irsyad A.", "Ahmad", "Haidar"],
-  },
-  {
-    id: "div_lomba",
-    label: "Divisi Lomba",
-    type: "division",
-    coordinator: "Shyfa",
-    members: ["Irsyad M.", "Almer", "Lian", "Yussie", "Saskia", "Fathimah", "Thifani", "Aina", "Roziq", "Qaila"],
-  },
-  {
-    id: "div_konsumsi",
-    label: "Konsumsi & P3K",
-    type: "division",
-    coordinator: "Kayyisa",
-    members: ["Fathia", "Zalfa", "Afiqoh", "Alifah", "Raissa", "Afiyah", "Annisa"],
-  },
-  {
-    id: "div_humas",
-    label: "Humas",
-    type: "division",
-    coordinator: "Jasmine",
-    members: ["Anakia", "Ray Jibril", "Kaulan", "Shafa", "Syarla", "Laila", "Irga"],
-  },
-  {
-    id: "div_kesekre",
-    label: "Kesekretariatan",
-    type: "division",
-    coordinator: "Rizka",
-    members: ["Aisha", "Zaki", "Tsuraya", "Aluna", "Kasih", "Rama"],
-  },
-  {
-    id: "div_keamanan",
-    label: "Keamanan",
-    type: "division",
-    coordinator: "Taqi",
-    members: ["Kiki", "Reyfa", "Ananda", "Raihan", "Akbar Darel", "Reifa"],
-  },
-  {
-    id: "div_pubdok",
-    label: "Pubdok",
-    type: "division",
-    coordinator: "Keysha",
-    members: ["Hafidh", "Attabi", "Tangguh", "Najwan", "Athaya", "Fahmi", "Rizqu", "Rizki"],
-  },
-  {
-    id: "div_lo",
-    label: "Liaison Officer (LO)",
-    type: "division",
-    coordinator: "Adhiena",
-    members: ["Vanesha", "Cleo", "Rashi", "Marisa", "Zahra", "Aisyah", "Nazmia", "Haifa"],
-  },
-  {
-    id: "div_danus",
-    label: "Danus",
-    type: "division",
-    coordinator: "Kezzia",
-    members: ["Azkarin", "Zulfan", "Nabilah", "Alfira", "Nafeeza", "Sofwan", "Hadziq"],
-  },
-  {
-    id: "div_artistik",
-    label: "Artistik",
-    type: "division",
-    coordinator: "Banita",
-    members: ["Aliya", "Rere", "Medina", "Nasya", "Keanu", "Alfian", "Hanum"],
-  },
-];
+import { committeeData, findDivisionByMember, getMainPhoto, type Member, type Division } from "@/data/committee";
 
 // Get initials from name
 function getInitials(name: string): string {
@@ -174,27 +73,277 @@ function getRoleGlowColor(role?: string): string {
   return "rgba(255,255,255,0.1)";
 }
 
+// Get badge color based on role
+function getRoleBadgeColor(role?: string): string {
+  if (!role) return "bg-white/10 text-white/60 border-white/20";
+  const lowerRole = role.toLowerCase();
+  if (lowerRole.includes("主席") || lowerRole.includes("ketua")) {
+    return "bg-amber-500/20 text-amber-300 border-amber-500/30";
+  }
+  if (lowerRole.includes("副主席") || lowerRole.includes("waket")) {
+    return "bg-orange-500/20 text-orange-300 border-orange-500/30";
+  }
+  if (lowerRole.includes("秘书") || lowerRole.includes("sek")) {
+    return "bg-cyan-500/20 text-cyan-300 border-cyan-500/30";
+  }
+  if (lowerRole.includes("财务") || lowerRole.includes("bend")) {
+    return "bg-emerald-500/20 text-emerald-300 border-emerald-500/30";
+  }
+  return "bg-white/10 text-white/60 border-white/20";
+}
+
+// ID Card Modal Component - Extra Large Version with Rectangular Photo
+interface IdCardModalProps {
+  member: Member | string;
+  division?: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function IdCardModal({ member, division, isOpen, onClose }: IdCardModalProps) {
+  const name = typeof member === "string" ? member : member.name;
+  const role = typeof member === "string" ? undefined : member.role;
+  const photos = typeof member === "string" ? undefined : (member.photos || (member.photo ? [member.photo] : undefined));
+  const initials = getInitials(name);
+  const gradientClass = getRoleAccentColor(role);
+  const borderClass = getRoleBorderColor(role);
+  const badgeClass = getRoleBadgeColor(role);
+
+  // Slider state
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState<number>(0);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  // Reset slider when member changes
+  useEffect(() => {
+    setCurrentPhotoIndex(0);
+  }, [member]);
+
+  // Handle ESC key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) {
+      document.addEventListener("keydown", handleEsc);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen, onClose]);
+
+  // Auto-slide when not hovered
+  useEffect(() => {
+    if (!isHovered && photos && photos.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isHovered, photos]);
+
+  const prevSlide = useCallback(() => {
+    if (photos && photos.length > 1) {
+      setCurrentPhotoIndex((prev) => (prev - 1 + photos.length) % photos.length);
+    }
+  }, [photos]);
+
+  const nextSlide = useCallback(() => {
+    if (photos && photos.length > 1) {
+      setCurrentPhotoIndex((prev) => (prev + 1) % photos.length);
+    }
+  }, [photos]);
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onClick={onClose}
+      >
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+        
+        {/* Modal Container - Extra Large */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          transition={{ type: "spring", duration: 0.4 }}
+          className="relative w-full max-w-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute -top-16 right-0 text-white/50 hover:text-white transition-colors duration-200"
+          >
+            <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* ID Card Design - Extra Large */}
+          <div className={`relative bg-gradient-to-br ${gradientClass} backdrop-blur-xl border ${borderClass} rounded-3xl overflow-hidden shadow-2xl`}>
+            {/* Background decoration - Larger */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-white/5 to-transparent rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-56 h-56 bg-gradient-to-tr from-white/5 to-transparent rounded-full translate-y-1/2 -translate-x-1/2" />
+            
+            {/* Content - Very Large padding */}
+            <div className="relative p-16">
+              {/* Edufest Logo/Header - Larger */}
+              <div className="text-center mb-10">
+                <p className="text-base font-medium text-white/40 tracking-widest uppercase">Edufest 2025</p>
+              </div>
+
+              {/* Photo Slider */}
+              <div className="flex justify-center mb-10">
+                <div className="relative">
+                  {/* Photo container - Auto size based on photo */}
+                  <div className={`rounded-2xl bg-gradient-to-br ${gradientClass} p-[4px]`}>
+                    <div 
+                      className="rounded-xl bg-[#0a0a0f] flex items-center justify-center overflow-hidden relative"
+                      style={{ maxWidth: '100%', maxHeight: '60vh' }}
+                      onMouseEnter={() => setIsHovered(true)}
+                      onMouseLeave={() => setIsHovered(false)}
+                    >
+                      {photos && photos.length > 0 ? (
+                        <AnimatePresence mode="wait">
+                          <motion.img
+                            key={currentPhotoIndex}
+                            src={photos[currentPhotoIndex]}
+                            alt={`${name} - Photo ${currentPhotoIndex + 1}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="max-w-full max-h-[55vh] w-auto h-auto object-contain"
+                          />
+                        </AnimatePresence>
+                      ) : (
+                        <div className="w-48 h-48 flex items-center justify-center">
+                          <span className="text-8xl font-semibold text-white/90">{initials}</span>
+                        </div>
+                      )}
+
+                      {/* Navigation buttons */}
+                      {photos && photos.length > 1 && (
+                        <>
+                          <button
+                            onClick={prevSlide}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white/70 hover:text-white transition-all duration-200 opacity-0 group-hover:opacity-100"
+                            style={{ opacity: isHovered ? 1 : 0 }}
+                          >
+                            <ChevronLeft className="w-6 h-6" />
+                          </button>
+                          <button
+                            onClick={nextSlide}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/30 hover:bg-black/50 text-white/70 hover:text-white transition-all duration-200 opacity-0 group-hover:opacity-100"
+                            style={{ opacity: isHovered ? 1 : 0 }}
+                          >
+                            <ChevronRight className="w-6 h-6" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Role badge - Below photo */}
+                  {role && (
+                    <div className={`absolute -bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-lg font-medium border ${badgeClass} whitespace-nowrap`}>
+                      {role.includes(" ") ? role.split(" ")[1] : role}
+                    </div>
+                  )}
+
+                  {/* Dots indicator */}
+                  {photos && photos.length > 1 && (
+                    <div className="flex justify-center mt-4 gap-2">
+                      {photos.map((_, idx) => (
+                        <div
+                          key={idx}
+                          className={`h-1.5 rounded-full transition-all duration-300 ${
+                            idx === currentPhotoIndex 
+                              ? "bg-white/80 w-8" 
+                              : "bg-white/20 w-2"
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Name - Responsive for long names */}
+              <div className="text-center mb-8">
+                <h3 className="text-4xl font-semibold text-white tracking-wide break-words max-w-full">
+                  {name}
+                </h3>
+              </div>
+
+              {/* Division Badge - Larger */}
+              {division && (
+                <div className="flex justify-center mb-8">
+                  <div className="px-10 py-4 rounded-full bg-white/5 border border-white/10">
+                    <span className="text-xl font-medium text-white/60">{division}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer decoration - Larger */}
+              <div className="flex justify-center items-center gap-4 pt-8 border-t border-white/10">
+                <div className="w-4 h-4 rounded-full bg-white/20" />
+                <div className="w-4 h-4 rounded-full bg-white/20" />
+                <div className="w-4 h-4 rounded-full bg-white/20" />
+              </div>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <p className="text-center text-white/30 text-base mt-6">
+            Klik di luar atau tekan ESC untuk menutup
+          </p>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 // Member Card Component - Modern Futuristik Minimalis
 interface MemberCardProps {
   member: Member | string;
   index: number;
   isCore?: boolean;
+  onClick?: (member: Member | string) => void;
 }
 
-function MemberCard({ member, index, isCore = false }: MemberCardProps) {
+function MemberCard({ member, index, isCore = false, onClick }: MemberCardProps) {
   const name = typeof member === "string" ? member : member.name;
   const role = typeof member === "string" ? undefined : member.role;
   const initials = getInitials(name);
   const gradientClass = getRoleAccentColor(role);
   const borderClass = getRoleBorderColor(role);
   const glowColor = getRoleGlowColor(role);
+  const mainPhoto = typeof member === "string" ? undefined : getMainPhoto(member);
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(member);
+    }
+  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03, duration: 0.4 }}
-      className={`relative p-5 bg-gradient-to-br ${gradientClass} backdrop-blur-md border ${borderClass} rounded-xl hover:bg-white/10 transition-all duration-300 group`}
+      onClick={handleClick}
+      className={`relative p-5 bg-gradient-to-br ${gradientClass} backdrop-blur-md border ${borderClass} rounded-xl hover:bg-white/10 transition-all duration-300 group cursor-pointer hover:scale-105 hover:shadow-lg hover:shadow-white/5`}
     >
       {/* Subtle glow effect on hover */}
       <div 
@@ -204,12 +353,12 @@ function MemberCard({ member, index, isCore = false }: MemberCardProps) {
 
       {/* Content */}
       <div className="relative flex flex-col items-center text-center">
-        {/* Photo circle dengan subtle ring */}
+        {/* Photo circle dengan subtle ring - Main photo */}
         <div className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-transparent p-[1px] mb-3">
-          <div className="w-full h-full rounded-full bg-white/5 flex items-center justify-center">
-            {typeof member !== "string" && member.photo ? (
+          <div className="w-full h-full rounded-full bg-white/5 flex items-center justify-center overflow-hidden">
+            {mainPhoto ? (
               <img 
-                src={member.photo} 
+                src={mainPhoto} 
                 alt={name}
                 className="w-full h-full rounded-full object-cover"
               />
@@ -318,9 +467,10 @@ function Level({ title, children, isCore = false }: LevelProps) {
 interface DivisionSectionProps {
   division: Division;
   index: number;
+  onMemberClick?: (member: Member | string) => void;
 }
 
-function DivisionSection({ division, index }: DivisionSectionProps) {
+function DivisionSection({ division, index, onMemberClick }: DivisionSectionProps) {
   const isCore = division.type === "core";
 
   return (
@@ -352,6 +502,7 @@ function DivisionSection({ division, index }: DivisionSectionProps) {
             member={member} 
             index={idx}
             isCore={isCore}
+            onClick={onMemberClick}
           />
         ))}
       </div>
@@ -373,10 +524,25 @@ function TreeConnector({ index, total }: { index: number; total: number }) {
 
 export default function PanitiaPage() {
   const [hoveredDivision, setHoveredDivision] = useState<string | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Member | string | null>(null);
+  const [selectedDivision, setSelectedDivision] = useState<string | null>(null);
   
   // Separate core and divisions
   const coreDivision = committeeData.find(d => d.type === "core");
   const otherDivisions = committeeData.filter(d => d.type !== "core");
+  
+  // Handle member click
+  const handleMemberClick = useCallback((member: Member | string) => {
+    setSelectedMember(member);
+    const division = findDivisionByMember(member, committeeData);
+    setSelectedDivision(division || null);
+  }, []);
+
+  // Handle modal close
+  const handleCloseModal = useCallback(() => {
+    setSelectedMember(null);
+    setSelectedDivision(null);
+  }, []);
   
   // Group divisions into rows for better layout
   const divisionRows = useMemo(() => {
@@ -470,6 +636,7 @@ export default function PanitiaPage() {
                   member={member} 
                   index={idx}
                   isCore={true}
+                  onClick={handleMemberClick}
                 />
               ))}
             </Level>
@@ -505,6 +672,7 @@ export default function PanitiaPage() {
                       key={division.id} 
                       division={division} 
                       index={rowIndex * row.length + idx}
+                      onMemberClick={handleMemberClick}
                     />
                   ))}
                 </div>
@@ -543,6 +711,14 @@ export default function PanitiaPage() {
       <footer className="relative z-10 py-6 text-center">
         <p className="text-xs text-white/25 font-light">Edufest 2025 ©</p>
       </footer>
+
+      {/* ID Card Modal - Extra Large Version with Rectangular Photo */}
+      <IdCardModal 
+        member={selectedMember || ""}
+        division={selectedDivision || undefined}
+        isOpen={selectedMember !== null}
+        onClose={handleCloseModal}
+      />
     </main>
   );
 }

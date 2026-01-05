@@ -101,21 +101,21 @@ Halaman timeline perjalanan event dari 2017-2026:
 
 ### 👥 Committee Page
 
-Struktur organisasi dengan 70+ anggota di 11 divisi:
+Halaman struktur organisasi dengan 80+ anggota di 11 divisi:
 
-| Division | Description |
-|----------|-------------|
-| Kepala Sekolah | Leadership |
-| Koordinator | Management |
-| Sie. Acara | Events |
-| Sie. Dana | Finance |
-| Sie. Publikasi | Public Relations |
-| Sie. Dokumentasi | Documentation |
-| Sie. Desain | Design |
-| Sie. PDD | Infrastructure |
-| Sie. Keamanan | Security |
-| Sie. Kreatif | Creative |
-| Sie. HC | Human Capital |
+| Division | Coordinator | Members |
+|----------|-------------|---------|
+| **Panitia Inti** | - | 4 (Ketum, Waket, Sek, Bend) |
+| **Divisi Acara** | Surya SIGIT | 9 |
+| **Divisi Lomba** | Shyfa Putri Azzahra | 10 |
+| **Konsumsi & P3K** | Kayyisa Fathiyyah | 7 |
+| **Humas** | Jasmine Vanya Aberka | 7 |
+| **Kesekretariatan** | Rizka Rasyidah | 6 |
+| **Keamanan** | Abdurrahman Taqi Prasetyo | 8 |
+| **Pubdok** | Keysha Nafidha Almira Gunawan | 8 |
+| **Liaison Officer (LO)** | Adhiena Zahra Rizkya | 8 |
+| **Danus** | Kezzia Annisa Salsabila | 7 |
+| **Artistik** | Banita Aliya Asrofa | 7 |
 
 ---
 
@@ -151,6 +151,7 @@ igloo-style-website/
 │   ├── ui/                # Generic UI elements
 │   ├── timeline/          # Timeline components
 │   └── globe/             # Globe visualization
+├── data/                  # Data files (committee.ts, etc.)
 ├── lib/                   # Utility functions and configurations
 ├── public/                # Static assets
 │   ├── images/            # Image files
@@ -297,7 +298,76 @@ Halaman struktur organisasi dengan:
 - 🌳 Tree view visualization
 - 📋 Division cards
 - 👤 Member profiles
-- 🔍 Search functionality
+- 🔍 Click-to-preview ID card (buka modal dengan detail lengkap)
+- 📁 Data terpisah di `data/committee.ts` untuk kemudahan pengelolaan
+
+#### Fitur ID Card Preview
+
+Ketika mengklik pada member card, akan tampil modal preview ID card yang **sangat besar** dengan foto yang sangat jelas:
+
+| Element | Ukuran | Description |
+|---------|--------|-------------|
+| 📷 Foto | **Auto-size** | Mengikuti ukuran foto asli (max 60vh) |
+| 👤 Nama | **4xl** | Font nama sangat besar |
+| 📛 Peran | **lg + badge** | Jabatan dengan badge besar di bawah foto |
+| 🏷️ Divisi | **xl + px-10 py-4** | Badge divisi yang sangat besar |
+| ✨ Edufest 2025 | **base** | Header event lebih besar |
+| 🔲 Close Button | **12x12** | Tombol X yang sangat besar |
+| 📐 Modal | **max-w-xl** | Lebar modal sangat besar |
+| 📏 Padding | **p-16** | Ruang dalam yang sangat luas |
+
+#### Fitur Image Slider
+
+Modal ID Card Preview dilengkapi dengan **image slider** untuk menampilkan 2 foto berbeda per member:
+
+| Feature | Description |
+|---------|-------------|
+| 🔄 **Auto-slide** | Foto berganti otomatis setiap 3 detik |
+| ⏸️ **Pause on hover** | Auto-slide berhenti saat kursor di atas foto |
+| ⬅️➡️ **Navigation buttons** | Tombol prev/next muncul saat hover |
+| 📍 **Dot indicator** | Menampilkan posisi foto saat ini |
+| 🎬 **Smooth transition** | Animasi fade antar foto |
+
+**Struktur Foto:**
+- **Foto Utama** (`photo`): Dari `/assets/panitia/Photo-Profile/` - ditampilkan di container bulat pada card
+- **Foto Kedua** (`photos[1]`): Dari `/assets/panitia/card/` - ditampilkan saat slide di modal
+
+```typescript
+// Contoh data member dengan 2 foto
+{
+  id: "inti_1",
+  role: "主席 ( Ketua Umum)",
+  name: "Muhammad Azzam Firdaus",
+  photo: "/assets/panitia/Photo-Profile/azzam.png",  // Foto utama (bulat di card)
+  photos: [
+    "/assets/panitia/Photo-Profile/azzam.png",  // Slide 1
+    "/assets/panitia/card/azzam.png"             // Slide 2
+  ]
+}
+```
+
+**Catatan:**
+- Foto di member card menggunakan **container bulat** (circular)
+- Foto di modal preview menggunakan **ukuran otomatis** mengikuti dimensi foto asli
+- Slider hanya aktif jika member memiliki lebih dari 1 foto
+
+#### Cara Menambahkan/Mengubah Data
+
+Edit file `data/committee.ts`:
+
+```typescript
+// Tambah member baru
+{ 
+  id: "div_acara",
+  label: "Divisi Acara",
+  type: "division",
+  coordinator: "Nama Koordinator",
+  members: [
+    "Nama Member",
+    { id: "unique_id", name: "Nama", role: "Jabatan", photo: "/path/to/photo.jpg" }
+  ],
+}
+```
 
 ### 🌍 Location Page (`/location`)
 
@@ -317,7 +387,7 @@ Halaman lokasi dengan globe interaktif:
 | Metric | Value |
 |--------|-------|
 | 🗓️ Years of History | **8** |
-| 👥 Committee Members | **70+** |
+| 👥 Committee Members | **80+** |
 | 🎬 Scenes | **5** |
 | 📂 Divisions | **11** |
 | 📄 Pages | **4** |
@@ -344,7 +414,7 @@ MIT License - lihat file [LICENSE](LICENSE) untuk detail.
 
 <div align="center">
 
-**Made with ❤️ by Fithrah Insani IT Team**
+**Made by Biezz**
 
 *"Amazing Intelligence, Delightful Entertain and Humanity"*
 
