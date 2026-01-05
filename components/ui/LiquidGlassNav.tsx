@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useMotionTemplate } from "framer-motion";
-import { Menu, X, Home, Clock, MapPin, Users, Settings } from "lucide-react";
+import { Menu, X, Home, Clock, MapPin, Users, Settings, InfoIcon } from "lucide-react";
 import Link from "next/link";
 
 export default function LiquidGlassNav() {
@@ -24,9 +24,10 @@ export default function LiquidGlassNav() {
     const navItems = [
         { label: "Home", href: "/", icon: Home },
         { label: "Timeline", href: "/timeline", icon: Clock },
-        { label: "Location", href: "#", icon: MapPin },
-        { label: "Speakers", href: "#", icon: Users },
+        { label: "Location", href: "/location", icon: MapPin },
+        { label: "Panitia", href: "/panitia", icon: Users },
         { label: "About", href: "#", icon: Settings },
+        { label: "More Info", href: "https://edufestbio.biezz.my.id", icon: InfoIcon },
     ];
 
     return (

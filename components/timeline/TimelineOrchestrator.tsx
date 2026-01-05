@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import TimelineItem from "./TimelineItem";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -14,8 +14,8 @@ const TIMELINE_HISTORY = [
         theme: "Pentas Seni, Perlombaan, Penggalangan Dana",
         participants: "500 (Peserta & Audiens)",
         guests: [
-            { name: "Shoutul Harokah", src: "/assets/timeline/Shoutul%20Harokah.svg" },
-            { name: "Ebith Beat A", src: "/assets/timeline/Ebith%20Beat%20A.svg" }
+            { name: "Shoutul Harokah", src: "/assets/timeline/Shoutul%20Harokah.jpg", objectPosition: "50% 35%" },
+            { name: "Ebith Beat A", src: "/assets/timeline/Ebith%20Beat%20A.jpg" }
         ]
     },
     {
@@ -24,9 +24,9 @@ const TIMELINE_HISTORY = [
         theme: "It’s Time To Shine",
         participants: "625 (Peserta & Audiens)",
         guests: [
-            { name: "Ust. Zae Hannan", src: "/assets/timeline/Ust.%20Zae%20Hannan.svg" },
-            { name: "Syekh Nashif Nashir", src: "/assets/timeline/Syekh%20Nashif%20Nashir.svg" },
-            { name: "Ali Sastra", src: "/assets/timeline/Ali%20Sastra.svg" }
+            { name: "Ust. Zae Hannan", src: "/assets/timeline/Ust.%20Zae%20Hannan.jpg" },
+            { name: "Syekh Nashif Nashir", src: "/assets/timeline/Syekh%20Nashif%20Nashir.jpg" },
+            { name: "Ali Sastra", src: "/assets/timeline/Ali%20Sastra.jpg" }
         ]
     },
     {
@@ -35,8 +35,8 @@ const TIMELINE_HISTORY = [
         theme: "Prove Our Ability Show Our Creativity",
         participants: "760 (Peserta & Audiens)",
         guests: [
-            { name: "Ridwan Hafidz", src: "/assets/timeline/Ridwan%20Hafidz.svg" },
-            { name: "Ibnu The Jenggot", src: "/assets/timeline/Ibnu%20The%20Jenggot.svg" }
+            { name: "Ridwan Hafidz", src: "/assets/timeline/Ridwan%20Hafidz.jpg" },
+            { name: "Ibnu The Jenggot", src: "/assets/timeline/Ibnu%20The%20Jenggot.jpg" }
         ]
     },
     {
@@ -45,8 +45,8 @@ const TIMELINE_HISTORY = [
         theme: "ANAGATA: Today For The Future",
         participants: "800 (Peserta & Audiens)",
         guests: [
-            { name: "Kang Yan Hidayatullah", src: "/assets/timeline/Kang%20Yan%20Hidayatullah.svg" },
-            { name: "Aleehya", src: "/assets/timeline/Aleehya.svg" }
+            { name: "Kang Yan Hidayatullah", src: "/assets/timeline/Kang%20Yan%20Hidayatullah.jpg" },
+            { name: "Aleehya", src: "/assets/timeline/Aleehya.jpg" }
         ]
     },
     {
@@ -55,8 +55,8 @@ const TIMELINE_HISTORY = [
         theme: "Universe: Be The Best In The Universe (Kajian Palestina, Bazaar)",
         participants: "900 (Peserta & Audiens)",
         guests: [
-            { name: "Genya", src: "/assets/timeline/Genya.svg" },
-            { name: "Ust. Handy Bonny", src: "/assets/timeline/Ust.%20Handy%20Bonny.svg" }
+            { name: "Genya", src: "/assets/timeline/Genya.jpg" },
+            { name: "Ust. Handy Bonny", src: "/assets/timeline/Ust.%20Handy%20Bonny.jpg" }
         ]
     },
     {
@@ -65,7 +65,7 @@ const TIMELINE_HISTORY = [
         theme: "Unity: Unity In Diversity",
         participants: "1000 (Peserta & Audiens)",
         guests: [
-            { name: "Ustadzah Haneen Akira", src: "/assets/timeline/Ustadzah%20Haneen%20Akira.svg" }
+            { name: "Ustadzah Haneen Akira", src: "/assets/timeline/Ustadzah%20Haneen%20Akira.jpg" }
         ]
     },
     {
@@ -74,9 +74,9 @@ const TIMELINE_HISTORY = [
         theme: "Aidentity: Amazing Intelligence, Delightful Entertain and Humanity",
         participants: "1500 (Peserta & Audiens)",
         guests: [
-            { name: "Fajri (Unity)", src: "/assets/timeline/Fajri%20(unity).svg" },
-            { name: "Zein Permana", src: "/assets/timeline/Zein%20Permana.svg" },
-            { name: "Ray Shareza", src: "/assets/timeline/Ray%20Shareza.svg" }
+            { name: "Fajri (Unity)", src: "/assets/timeline/Fajri%20(unity).jpg" },
+            { name: "Zein Permana", src: "/assets/timeline/Zein%20Permana.jpg", objectPosition: "50% 35%" },
+            { name: "Ray Shareza", src: "/assets/timeline/Ray%20Shareza.jpg" }
         ]
     },
     {
@@ -90,20 +90,13 @@ const TIMELINE_HISTORY = [
 
 export default function TimelineOrchestrator() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"],
-    });
-
-    const backgroundY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
     return (
         <div ref={containerRef} className="relative w-full min-h-screen overflow-hidden bg-[#0a0a0a]">
             {/* Background Elements */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-                <motion.div
-                    style={{ y: backgroundY }}
-                    className="absolute top-0 left-0 w-full h-[150%] bg-[url('/assets/noise.png')] opacity-10"
+                <div
+                    className="absolute top-0 left-0 w-full h-full bg-[url('/assets/noise.png')] opacity-10 bg-repeat"
                 />
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-900/20 rounded-full blur-3xl filter" />
                 <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-900/20 rounded-full blur-3xl filter" />
@@ -144,7 +137,8 @@ export default function TimelineOrchestrator() {
                             participants={item.participants}
                             guests={item.guests.map(g => ({
                                 name: g.name,
-                                imageSrc: g.src
+                                imageSrc: g.src,
+                                objectPosition: g.objectPosition
                             }))}
                             index={index}
                         />

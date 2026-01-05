@@ -5,7 +5,10 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import IntroOrchestrator from "@/components/intro/IntroOrchestrator";
+import LiquidGlassNav from "@/components/ui/LiquidGlassNav";
+import PageTransitionLoader from "@/components/ui/PageTransitionLoader";
 
 // Load CursorParticles only on client-side to avoid hydration mismatch
 const CursorParticles = dynamic(() => import("@/components/CursorParticles"), {
@@ -25,19 +28,25 @@ export default function RootLayout({
 }) {
   useSmoothScroll();
   const [introComplete, setIntroComplete] = useState(false);
+  const pathname = usePathname();
+  const showNav = pathname !== "/";
 
   return (
     <html lang="en">
       <body suppressHydrationWarning className={`${inter.className} bg-[var(--background)] text-[var(--foreground)] antialiased no-scrollbar`}>
         <CursorParticles />
         <AudioManager isLoading={!introComplete} />
+        <PageTransitionLoader />
         {!introComplete ? (
           <IntroOrchestrator
             onComplete={() => setIntroComplete(true)}
             skipOnRevisit={false}
           />
         ) : (
-          children
+          <>
+            {showNav && <LiquidGlassNav />}
+            {children}
+          </>
         )}
       </body>
     </html>

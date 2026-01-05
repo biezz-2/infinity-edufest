@@ -8,6 +8,7 @@ import { Users, Calendar, Music } from "lucide-react";
 interface Guest {
     name: string;
     imageSrc?: string;
+    objectPosition?: string; // Untuk menyesuaikan posisi gambar jika wajah terpotong
 }
 
 interface TimelineItemProps {
@@ -77,16 +78,17 @@ export default function TimelineItem({ year, date, theme, participants, guests, 
                                 {guests.map((guest, idx) => (
                                     <div key={idx} className="flex flex-col items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors group/guest w-32 md:w-40 flex-shrink-0">
                                         {guest.imageSrc ? (
-                                            <div className="relative w-24 h-24 rounded-full overflow-hidden bg-white/10 shadow-lg group-hover/guest:scale-110 transition-transform duration-300">
+                                            <div className="relative w-[130px] h-[130px] rounded-full overflow-hidden bg-white/10 shadow-lg group-hover/guest:scale-110 transition-transform duration-300">
                                                 <Image
                                                     src={guest.imageSrc}
                                                     alt={guest.name}
                                                     fill
                                                     className="object-cover"
+                                                    style={{ objectPosition: guest.objectPosition || "center" }}
                                                 />
                                             </div>
                                         ) : (
-                                            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold shadow-lg group-hover/guest:scale-110 transition-transform duration-300">
+                                            <div className="w-[130px] h-[130px] rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-3xl font-bold shadow-lg group-hover/guest:scale-110 transition-transform duration-300">
                                                 {guest.name.charAt(0)}
                                             </div>
                                         )}
