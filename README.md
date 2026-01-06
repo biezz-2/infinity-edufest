@@ -217,7 +217,7 @@ Halaman struktur organisasi dengan **80+ anggota** di **11 divisi**:
 | Divisi Acara | Surya SIGIT | 9 |
 | Divisi Lomba | Shyfa Putri Azzahra | 10 |
 | Konsumsi & P3K | Kayyisa Fathiyyah | 7 |
-| Humas | Jasmine Vanya Aberka | 7 |
+| Humbas | Jasmine Vanya Aberka | 7 |
 | Kesekretariatan | Rizka Rasyidah | 6 |
 | Keamanan | Abdurrahman Taqi Prasetyo | 8 |
 | Pubdok | Keysha Nafidha Almira Gunawan | 8 |
@@ -287,91 +287,50 @@ Button dengan efek magnetik mengikuti kursor:
 
 ## 🏗️ Architecture
 
-```mermaid
-graph TB
-    subgraph Next.js App Router
-        subgraph Pages
-            Home["/ - Home Page"]
-            Timeline["/timeline"]
-            Panitia["/panitia"]
-            Location["/location"]
-        end
-    end
-
-    subgraph Components
-        subgraph Scenes
-            SceneIntro
-            SceneOne
-            SceneAbout
-            SceneSelayang
-            SceneInteractive
-        end
-
-        subgraph Intro System
-            IntroOrchestrator
-            LoaderStage
-            WireframeStage
-            RevealStage
-        end
-
-        subgraph UI Components
-            LiquidGlassNav
-            MagneticButton
-            CursorParticles
-            LoadingScreen
-        end
-
-        subgraph Feature Components
-            TimelineOrchestrator
-            TickerGallery
-            GlobeToMapTransform
-            AudioManager
-        end
-    end
-
-    subgraph Data Layer
-        committee.ts["committee.ts - 80+ members"]
-        timelineData["Timeline history 2017-2026"]
-    end
-
-    subgraph Animation Layer
-        GSAP["GSAP + ScrollTrigger"]
-        Framer["Framer Motion"]
-        Lenis["Lenis Smooth Scroll"]
-    end
-
-    Home --> Scenes
-    Timeline --> TimelineOrchestrator
-    Location --> GlobeToMapTransform
-    panitia --> committee.ts
-
-    Scenes --> GSAP
-    LiquidGlassNav --> Framer
-    CursorParticles --> Canvas API
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Next.js App Router                        │
+├──────────────┬──────────────┬──────────────┬───────────────┤
+│   Home Page  │   Timeline   │   panitia    │   Location    │
+│     (/)      │   (/timeline)│   (/panitia) │   (/location) │
+└──────┬───────┴──────┬───────┴──────┬───────┴───────┬───────┘
+       │              │              │               │
+       v              v              v               v
+┌─────────────────────────────────────────────────────────────┐
+│                      Components                              │
+├──────────────────┬──────────────────┬───────────────────────┤
+│   5 Scenes       │   Intro System   │   UI Components       │
+│ (Intro,One,      │ (3-stage intro)  │ (Nav, Button, etc)   │
+│  About,Selayang, │                  │                       │
+│  Interactive)    │                  │                       │
+├──────────────────┴──────────────────┴───────────────────────┤
+│                 Feature Components                           │
+│  (Timeline, TickerGallery, GlobeToMap, AudioManager)        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              v
+┌─────────────────────────────────────────────────────────────┐
+│                      Animation Layer                         │
+│           GSAP + ScrollTrigger, Framer Motion, Lenis        │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              v
+┌─────────────────────────────────────────────────────────────┐
+│                        Data Layer                            │
+│            committee.ts (80+ members), Timeline data         │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ### Data Flow
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant IntroOrchestrator
-    participant LiquidGlassNav
-    participant Scene
-    participant Component
-
-    User->>IntroOrchestrator: First visit
-    IntroOrchestrator->>User: 3-stage intro animation
-    
-    User->>LiquidGlassNav: Click menu item
-    LiquidGlassNav->>Scene: Navigate to page
-    
-    Scene->>GSAP: Register ScrollTrigger
-    GSAP->>User: Scroll-based animations
-    
-    User->>Component: Interact (click, hover)
-    Component->>Framer: Animate transition
-    Framer->>User: Visual feedback
+```
+User → Intro Orchestrator → 3-stage animation
+     ↓
+User → LiquidGlassNav → Navigate to page
+     ↓
+Page → GSAP ScrollTrigger → Scroll-based animations
+     ↓
+User → Component Interaction → Framer Motion → Visual feedback
 ```
 
 ---
@@ -599,9 +558,8 @@ NEXT_PUBLIC_API_URL=https://api.example.com
 
 Halaman utama dengan 5 scene interaktif:
 
-```mermaid
-graph LR
-    SceneIntro --> SceneOne --> SceneAbout --> SceneSelayang --> SceneInteractive
+```
+SceneIntro → SceneOne → SceneAbout → SceneSelayang → SceneInteractive
 ```
 
 | Scene | Height | Animation | Content |
