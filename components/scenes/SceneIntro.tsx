@@ -13,8 +13,8 @@ const audiowide = Audiowide({
 export default function SceneIntro() {
     const containerRef = useRef<HTMLDivElement>(null);
     const logoRef = useRef<HTMLDivElement>(null);
-    const textRef = useRef<HTMLHeadingElement>(null);
-    const taglineRef = useRef<HTMLParagraphElement>(null);
+    const textRef = useRef<HTMLImageElement>(null);
+    const taglineRef = useRef<HTMLDivElement>(null);
 
     useGSAP((gsap) => {
         const tl = gsap.timeline();
@@ -63,8 +63,8 @@ export default function SceneIntro() {
 
     return (
         <section ref={containerRef} className="h-screen w-full flex items-center justify-center relative z-10 bg-gradient-to-b from-[var(--background)] to-[var(--background-accent)]">
-            <div className="text-center flex flex-col items-center">
-                <div ref={logoRef} className="mb-[-4rem] md:mb-[-8rem] z-20">
+            <div className="text-center flex flex-col items-center gap-0">
+                <div ref={logoRef}>
                     <Image
                         src="/images/logo-fiedufest.png"
                         alt="The 8th Annual FIEDUFEST"
@@ -74,10 +74,16 @@ export default function SceneIntro() {
                         className="w-96 md:w-[850px] h-auto drop-shadow-2xl"
                     />
                 </div>
-                <h1 ref={textRef} className={`${audiowide.className} text-6xl md:text-9xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-[var(--foreground)] to-[var(--muted-foreground)] relative z-10 select-none`}>
-                    INFINITY
-                </h1>
-                <div ref={taglineRef} className="mt-8 flex flex-col items-center gap-4">
+                <div ref={taglineRef} className="flex flex-col items-center gap-4 mt-8 relative z-30">
+                    <Image
+                        ref={textRef}
+                        src="/images/logo-infinity.png"
+                        alt="INFINITY"
+                        width={800}
+                        height={400}
+                        priority
+                        className="w-80 md:w-[600px] h-auto object-contain"
+                    />
                     <div className="w-12 h-[1px] bg-[#ff0088] opacity-50" />
                     <p className="text-[10px] tracking-[0.6em] uppercase text-[var(--muted-foreground)] font-bold">
                         Scroll to Explore

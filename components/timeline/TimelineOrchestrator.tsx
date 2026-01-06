@@ -82,8 +82,8 @@ const TIMELINE_HISTORY = [
     {
         year: "2026",
         date: "13–14 Februari 2026",
-        theme: "Tema Belum Ditentukan",
-        participants: "Target Belum Ditentukan",
+        theme: "Infinity: Growing Talents Beyond Infinity",
+        participants: "To Be Continued",
         guests: []
     }
 ];
