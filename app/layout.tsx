@@ -6,6 +6,7 @@ import { Inter } from "next/font/google";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import IntroOrchestrator from "@/components/intro/IntroOrchestrator";
 import LiquidGlassNav from "@/components/ui/LiquidGlassNav";
 import PageTransitionLoader from "@/components/ui/PageTransitionLoader";
@@ -48,6 +49,7 @@ export default function RootLayout({
             {children}
           </>
         )}
+        <Analytics />
       </body>
     </html>
   );
